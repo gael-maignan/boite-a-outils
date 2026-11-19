@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boîte à outils</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='3' width='10' height='10' fill='%23111'/%3E%3C/svg%3E">
+
+<style>
+:root{--bg:#f6f6f4;--surface:#fff;--text:#111;--muted:#6b6b68;--line:#dededa;--field:#c8c8c3;--soft:#f0f0ed;--error:#b3261e;
+font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--text);background:var(--bg)}
+*,*::before,*::after{box-sizing:border-box;border-radius:0}
+body{margin:0;font-size:15px;line-height:1.5;background:var(--bg);min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit;border-radius:0}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+
+/* Barre de navigation */
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.topbar-in{max-width:1080px;margin:0 auto;padding:0 24px;display:flex;align-items:stretch;gap:28px;min-height:56px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:650;font-size:15px;text-decoration:none;white-space:nowrap;letter-spacing:-.01em}
+.brand-mark{width:12px;height:12px;background:var(--text);flex:none}
+.nav{display:flex;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:flex;align-items:center;padding:0 10px;font-size:13.5px;color:var(--muted);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.nav a:hover{color:var(--text)}
+.nav a[aria-current=page]{color:var(--text);border-bottom-color:var(--text);font-weight:550}
+@media(max-width:1060px){.topbar-in{flex-direction:column;gap:0;padding:0}.brand{padding:14px 20px 4px}.nav{margin-left:0;padding:0 8px}.nav a{padding:10px 12px}}
+
+/* Page */
+.page{width:100%;max-width:1080px;margin:0 auto;padding:48px 24px 56px;flex:1}
+.page-head{margin-bottom:32px;max-width:660px}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+h1{font-size:30px;line-height:1.15;font-weight:650;letter-spacing:-.02em;margin:0 0 10px}
+.lead{color:var(--muted);margin:0;font-size:16px}
+
+/* Étapes */
+.step{background:var(--surface);border:1px solid var(--line);padding:28px;margin-bottom:16px}
+.step-head{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.step-num{font-size:12px;font-variant-numeric:tabular-nums;letter-spacing:.06em;color:var(--muted);border:1px solid var(--line);padding:1px 7px}
+.step-title{font-size:16px;font-weight:600;margin:0}
+.step-aside{margin-left:auto;font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.hint{font-size:13px;color:var(--muted);margin:-8px 0 0}
+
+/* Zone de dépôt */
+.drop{border:1px dashed #a5a5a0;background:#fbfbfa;padding:44px 20px;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;user-select:none}
+.drop:hover,.drop.is-over{background:var(--soft);border-color:var(--text);border-style:solid}
+.drop.is-disabled{opacity:.5;pointer-events:none}
+.drop-icon{display:block;margin:0 auto 14px}
+.drop-title{display:block;font-weight:600;margin-bottom:4px}
+.drop-hint{color:var(--muted);font-size:13.5px}
+
+/* Boutons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border:1px solid var(--field);background:var(--surface);cursor:pointer;font-size:14px;font-weight:500;text-decoration:none;white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
+.btn:hover:not(:disabled){border-color:var(--text)}
+.btn-primary{background:var(--text);border-color:var(--text);color:#fff}
+.btn-primary:hover:not(:disabled){background:#383836;border-color:#383836}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{min-height:32px;padding:0 12px;font-size:13px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:24px}
+
+/* Champs */
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:8px}
+.field select,.field input[type=number]{width:100%;height:40px;padding:0 12px;border:1px solid var(--field);background-color:var(--surface)}
+.field select{appearance:none;-webkit-appearance:none;padding-right:36px;cursor:pointer;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23111' stroke-width='1.4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.field select:hover,.field input[type=number]:hover{border-color:#8f8f8a}
+.field select:focus,.field input:focus{outline:none;border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text)}
+.field small{display:block;margin-top:6px;font-size:12px;color:var(--muted);line-height:1.45}
+.field input[type=range]{width:100%;accent-color:var(--text);margin:10px 0 0}
+
+.check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:14px;margin-top:20px;user-select:none}
+.check input{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin:1px 0 0;border:1px solid var(--text);background:var(--surface);flex:none;cursor:pointer;display:grid;place-content:center}
+.check input::after{content:"";width:10px;height:10px;background:var(--text);transform:scale(0);transition:transform .1s}
+.check input:checked::after{transform:scale(1)}
+.check small{display:block;color:var(--muted);font-size:12px}
+.fields+.check{padding-top:20px;border-top:1px solid var(--line)}
+.gain{color:var(--text);font-weight:600}
+video{width:100%;max-height:420px;background:#000;display:block;margin:16px 0}
+
+/* Fichier sélectionné */
+.file-row{display:flex;align-items:center;gap:16px;padding:14px 16px;border:1px solid var(--line);background:#fbfbfa}
+.file-row .ico{flex:none}
+.file-info{min-width:0;flex:1}
+.file-name{font-weight:550;overflow-wrap:anywhere}
+.file-meta{font-size:13px;color:var(--muted)}
+
+/* Vignettes */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:16px}
+.grid:not(:empty){margin-top:20px}
+.card{border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;min-width:0;transition:border-color .12s}
+.card:hover{border-color:#a5a5a0}
+.thumb{height:172px;background:var(--soft);display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--line);padding:8px}
+.thumb img{max-width:100%;max-height:100%;object-fit:contain;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+.card-body{padding:10px 12px 12px;min-width:0}
+.card-title{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-actions{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border-top:1px solid var(--line);margin-top:auto}
+.card-actions button{border:0;border-right:1px solid var(--line);background:var(--surface);min-height:36px;cursor:pointer;font-size:13px;padding:0 6px}
+.card-actions button:last-child{border-right:0}
+.card-actions button:hover:not(:disabled){background:var(--text);color:#fff}
+.card-actions button:disabled{color:#bdbdb8;cursor:not-allowed}
+.card-actions.wide-last{grid-auto-columns:auto;grid-template-columns:1fr 1fr 2fr}
+.card[draggable=true]{cursor:grab}
+.card.is-dragging{opacity:.35}
+.card.is-target{border-color:var(--text);box-shadow:inset 0 0 0 1px var(--text)}
+
+/* Progression et messages */
+.progress{height:3px;background:var(--line);margin-top:22px;overflow:hidden}
+.progress>div{height:100%;width:0;background:var(--text);transition:width .2s}
+.progress-head{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:22px}
+.progress-head+.progress{margin-top:8px}
+.status{font-size:13.5px;color:var(--muted);margin:14px 0 0;min-height:20px;white-space:pre-wrap;overflow-wrap:anywhere}
+.status.is-error{color:var(--error)}
+.status.is-ok{color:var(--text)}
+.status.is-ok::before{content:"✓  "}
+
+.page-note{font-size:12.5px;color:var(--muted);margin:28px 0 0;max-width:720px;line-height:1.6}
+.site-foot{border-top:1px solid var(--line);background:var(--surface)}
+.site-foot div{max-width:1080px;margin:0 auto;padding:18px 24px;font-size:12.5px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;justify-content:flex-end}
+.site-foot a{text-decoration:none}.site-foot a:hover{color:var(--text)}
+
+audio{width:100%;display:block;margin:16px 0}
+
+@media(max-width:600px){.page{padding:32px 16px 40px}h1{font-size:25px}.step{padding:20px 16px}.drop{padding:32px 16px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.thumb{height:140px}.step-aside{margin-left:0;width:100%}}
+
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));padding:1px 0 0 1px}
+.tool{position:relative;display:flex;flex-direction:column;gap:6px;padding:28px;min-height:236px;background:var(--surface);border:1px solid var(--line);margin:-1px 0 0 -1px;text-decoration:none;transition:background .15s,color .15s}
+.tool-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}
+.tool-num{font-size:12px;letter-spacing:.06em;color:var(--muted);font-variant-numeric:tabular-nums}
+.tool h2{font-size:18px;font-weight:600;letter-spacing:-.01em;margin:0}
+.tool p{margin:0;color:var(--muted);font-size:14px}
+.tool-foot{margin-top:auto;padding-top:22px;display:flex;justify-content:space-between;align-items:center;font-size:12.5px}
+.tag{color:var(--muted);border:1px solid var(--line);padding:1px 7px;font-size:12px}
+.go{font-weight:550}
+a.tool:hover{background:var(--text);color:#fff}
+a.tool:hover p,a.tool:hover .tool-num{color:#b5b5b0}
+a.tool:hover .tag{color:#d0d0cc;border-color:#555}
+.tool.info{background:transparent}
+.tool.info h2{font-size:15px}
+.tool.info ul{margin:4px 0 0;padding:0;list-style:none;color:var(--muted);font-size:14px}
+.tool.info li{padding:6px 0;border-bottom:1px solid var(--line)}
+.tool.info li:last-child{border-bottom:0}
+
+.group{margin-bottom:40px}
+.group-title{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:0 0 12px}
+.tool{min-height:210px}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-in"><a class="brand" href="index.html"><span class="brand-mark"></span>Boîte à outils</a><nav class="nav" aria-label="Outils"><a href="index.html" aria-current="page">Accueil</a><a href="organiser_fusionner_pdf.html">Fusionner PDF</a><a href="pdf_vers_images.html">PDF → images</a><a href="images_vers_pdf.html">Images → PDF</a><a href="convertir_images.html">Convertir images</a><a href="images_noir_blanc.html">Noir et blanc</a><a href="convertir_video.html">Convertir vidéo</a><a href="extraire_audio.html">Extraire l’audio</a></nav></div></header>
+<main class="page">
+<header class="page-head"><h1>Boîte à outils</h1></header><section class="group"><h2 class="group-title">PDF</h2><div class="tools"><a class="tool" href="organiser_fusionner_pdf.html"><div class="tool-top"><span class="tool-num">01</span><svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M9 3h11v14H9z"/><path d="M5 7v14h11"/></svg></div><h2>Organiser et fusionner des PDF</h2><p>Réorganisez les pages, retirez celles qui ne servent pas et réunissez plusieurs PDF en un seul.</p><div class="tool-foot"><span></span><span class="go">Ouvrir →</span></div></a><a class="tool" href="pdf_vers_images.html"><div class="tool-top"><span class="tool-num">02</span><svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 4h18v16H3z"/><path d="M3 16l5-5 5 5 3-3 5 5"/><path d="M15 8h1v1h-1z"/></svg></div><h2>PDF vers images</h2><p>Convertissez chaque page d’un PDF en image PNG, JPG ou WebP.</p><div class="tool-foot"><span></span><span class="go">Ouvrir →</span></div></a><a class="tool" href="images_vers_pdf.html"><div class="tool-top"><span class="tool-num">03</span><svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M5 2h10l4 4v16H5z"/><path d="M15 2v4h4"/><path d="M8.5 12h7M8.5 16h7"/></svg></div><h2>Images vers PDF</h2><p>Assemblez plusieurs images en un seul PDF, une image par page.</p><div class="tool-foot"><span></span><span class="go">Ouvrir →</span></div></a></div></section><section class="group"><h2 class="group-title">Images</h2><div class="tools"><a class="tool" href="convertir_images.html"><div class="tool-top"><span class="tool-num">04</span><svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 5h12v10H3z"/><path d="M3 12l4-3 4 3"/><path d="M9 19h12V9"/><path d="M17 5l2 2-2 2"/></svg></div><h2>Convertir et compresser des images</h2><p>Changez le format de vos photos (WebP, JPG, PNG) et réduisez leur résolution pour alléger les fichiers.</p><div class="tool-foot"><span></span><span class="go">Ouvrir →</span></div></a><a class="tool" href="images_noir_blanc.html"><div class="tool-top"><span class="tool-num">05</span><svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 3h18v18H3z"/><path d="M12 3v18H3z" fill="currentColor" stroke="none"/></svg></div><h2>Images en noir et blanc</h2><p>Convertissez vos images en niveaux de gris, en une fois.</p><div class="tool-foot"><span></span><span class="go">Ouvrir →</span></div></a></div></section><section class="group"><h2 class="group-title">Vidéo et audio</h2><div class="tools"><a class="tool" href="convertir_video.html"><div class="tool-top"><span class="tool-num">06</span><svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 6h13v12H3z"/><path d="M16 10l5-3v10l-5-3"/></svg></div><h2>Convertir une vidéo</h2><p>Convertissez une vidéo en WebM ou MP4 et réduisez sa résolution.</p><div class="tool-foot"><span></span><span class="go">Ouvrir →</span></div></a><a class="tool" href="extraire_audio.html"><div class="tool-top"><span class="tool-num">07</span><svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 11v2M7 8v8M11 4v16M15 7v10M19 10v4"/></svg></div><h2>Extraire l’audio d’une vidéo</h2><p>Récupérez la bande son d’une vidéo en MP3, OGG ou WAV.</p><div class="tool-foot"><span></span><span class="go">Ouvrir →</span></div></a></div></section>
+</main>
+<footer class="site-foot"><div><a href="index.html">← Tous les outils</a></div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function actionBtn(label,title,disabled,fn){const b=el('button',null,label);b.type='button';b.title=title;b.setAttribute('aria-label',title);b.disabled=!!disabled;b.addEventListener('click',fn);return b}
+function setStatus(node,msg,type){node.textContent=msg||'';node.className='status'+(type?' is-'+type:'')}
+function fmtBytes(n){if(!Number.isFinite(n))return '';const u=['o','Ko','Mo','Go'];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return `${n.toFixed(i?1:0).replace('.',',')} ${u[i]}`}
+function baseName(n){return n.replace(/\.[^.]+$/,'')||'fichier'}
+function plural(n,word){return n+' '+word+(n>1?'s':'')}
+function saveBlob(blob,name){const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}
+/* Zone de dépôt : clic, clavier, glisser-déposer */
+function bindDrop(zone,input,onFiles){
+  const hasFiles=e=>[...(e.dataTransfer?.types||[])].includes('Files');
+  zone.addEventListener('click',()=>input.click());
+  zone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}});
+  input.addEventListener('change',()=>{onFiles(input.files);input.value=''});
+  ['dragenter','dragover'].forEach(t=>zone.addEventListener(t,e=>{if(!hasFiles(e))return;e.preventDefault();zone.classList.add('is-over')}));
+  zone.addEventListener('dragleave',e=>{if(!zone.contains(e.relatedTarget))zone.classList.remove('is-over')});
+  zone.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();zone.classList.remove('is-over');if(e.dataTransfer.files.length)onFiles(e.dataTransfer.files)});
+}
+/* Évite que le navigateur ouvre un fichier lâché à côté de la zone */
+['dragover','drop'].forEach(t=>window.addEventListener(t,e=>{if([...(e.dataTransfer?.types||[])].includes('Files'))e.preventDefault()}));
+/* Réordonnancement des vignettes par glisser-déposer */
+const sortState={from:null};
+function makeSortable(card,index,move){
+  card.draggable=true;
+  card.addEventListener('dragstart',e=>{sortState.from=index;card.classList.add('is-dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','')});
+  card.addEventListener('dragend',()=>{sortState.from=null;card.classList.remove('is-dragging');document.querySelectorAll('.is-target').forEach(c=>c.classList.remove('is-target'))});
+  card.addEventListener('dragover',e=>{if(sortState.from===null)return;e.preventDefault();e.dataTransfer.dropEffect='move';card.classList.add('is-target')});
+  card.addEventListener('dragleave',e=>{if(!card.contains(e.relatedTarget))card.classList.remove('is-target')});
+  card.addEventListener('drop',e=>{if(sortState.from===null)return;e.preventDefault();e.stopPropagation();card.classList.remove('is-target');const from=sortState.from;sortState.from=null;if(from!==index)move(from,index)});
+}
+/* Copie d'une image dans le presse-papiers (PNG) */
+function toPngBlob(blob){return new Promise(resolve=>{const img=new Image(),url=URL.createObjectURL(blob);img.onload=()=>{const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);c.toBlob(b=>{URL.revokeObjectURL(url);resolve(b)},'image/png')};img.onerror=()=>{URL.revokeObjectURL(url);resolve(null)};img.src=url})}
+async function copyImage(blob,button){
+  const label=button.textContent;
+  try{
+    if(!navigator.clipboard||!window.ClipboardItem)throw new Error('La copie d’image n’est pas prise en charge par ce navigateur (HTTPS ou localhost requis).');
+    const png=blob.type==='image/png'?blob:await toPngBlob(blob);
+    if(!png)throw new Error('Impossible de préparer l’image pour le presse-papiers.');
+    await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);
+    button.textContent='Copiée ✓';
+  }catch(err){button.textContent='Échec';button.title=err.message;alert('Copie impossible : '+err.message)}
+  setTimeout(()=>{button.textContent=label},1600);
+}
+
+/* Bibliothèques intégrées (gzip + base64) */
+async function unpackBytes(id){
+  const node=$(id);if(!node)throw new Error('bibliothèque manquante ('+id+')');
+  if(!('DecompressionStream' in window))throw new Error('navigateur trop ancien, mettez-le à jour.');
+  const bin=Uint8Array.from(atob(node.textContent.trim()),c=>c.charCodeAt(0));
+  return await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+}
+async function unpackText(id){return new TextDecoder().decode(await unpackBytes(id))}
+async function loadLib(id){(0,eval)(await unpackText(id)+'\n')}
+async function loadPdfJs(){
+  await loadLib('lib-pdfjs');
+  const worker=await unpackText('lib-pdfjs-worker');
+  pdfjsLib.GlobalWorkerOptions.workerPort=new Worker(URL.createObjectURL(new Blob([worker,'\n'],{type:'text/javascript'})));
+}
+function crc32(data){let c=0xffffffff;for(let i=0;i<data.length;i++){c^=data[i];for(let j=0;j<8;j++)c=(c>>>1)^((c&1)?0xedb88320:0)}return(c^0xffffffff)>>>0}
+
+/* Métadonnées EXIF : lecture, création et réinsertion (JPEG, PNG, WebP) */
+const Meta={
+  async read(file){
+    try{
+      const b=new Uint8Array(await file.arrayBuffer()),dv=new DataView(b.buffer);let t=null;
+      const str=(o,n)=>String.fromCharCode(...b.subarray(o,o+n));
+      if(b[0]===0xFF&&b[1]===0xD8){
+        let i=2;
+        while(i+4<b.length&&b[i]===0xFF){
+          const m=b[i+1];if(m===0xDA||m===0xD9)break;
+          if(m===0x01||(m>=0xD0&&m<=0xD7)){i+=2;continue}
+          const len=dv.getUint16(i+2);
+          if(m===0xE1&&str(i+4,6)==='Exif\0\0'){t=b.slice(i+10,i+2+len);break}
+          i+=2+len;
+        }
+      }else if(str(1,3)==='PNG'){
+        let i=8;
+        while(i+8<=b.length){const len=dv.getUint32(i),type=str(i+4,4);if(type==='eXIf'){t=b.slice(i+8,i+8+len);break}if(type==='IEND')break;i+=12+len}
+      }else if(str(0,4)==='RIFF'&&str(8,4)==='WEBP'){
+        let i=12;
+        while(i+8<=b.length){const type=str(i,4),len=dv.getUint32(i+4,true);if(type==='EXIF'){t=b.slice(i+8,i+8+len);if(str(i+8,6)==='Exif\0\0')t=t.slice(6);break}i+=8+len+(len&1)}
+      }
+      if(!t||t.length<8)return null;
+      return Meta.resetOrientation(t);
+    }catch(e){console.warn('Lecture EXIF impossible',e);return null}
+  },
+  /* Les pixels sont déjà redressés par le navigateur : l'orientation est remise à 1 */
+  resetOrientation(t){
+    const dv=new DataView(t.buffer,t.byteOffset,t.byteLength),le=t[0]===0x49,ifd=dv.getUint32(4,le);
+    if(ifd+2>t.length)return t;
+    const n=dv.getUint16(ifd,le);
+    for(let k=0;k<n;k++){const e=ifd+2+k*12;if(e+12>t.length)break;if(dv.getUint16(e,le)===0x0112){dv.setUint16(e+8,1,le)}}
+    return t;
+  },
+  /* Construit un bloc EXIF simple à partir de champs texte (tags ASCII de l'IFD0) */
+  build(fields){
+    const enc=new TextEncoder(),ents=Object.entries(fields).filter(([,v])=>v).map(([tag,v])=>[Number(tag),enc.encode(String(v)+'\0')]).sort((a,b)=>a[0]-b[0]);
+    if(!ents.length)return null;
+    const head=8,ifdLen=2+ents.length*12+4;let dataOff=head+ifdLen;
+    const size=dataOff+ents.reduce((s,[,d])=>s+(d.length>4?d.length+(d.length&1):0),0);
+    const t=new Uint8Array(size),dv=new DataView(t.buffer);
+    t.set([0x49,0x49,0x2A,0x00]);dv.setUint32(4,8,true);dv.setUint16(8,ents.length,true);
+    ents.forEach(([tag,d],k)=>{const e=10+k*12;dv.setUint16(e,tag,true);dv.setUint16(e+2,2,true);dv.setUint32(e+4,d.length,true);
+      if(d.length<=4)t.set(d,e+8);else{dv.setUint32(e+8,dataOff,true);t.set(d,dataOff);dataOff+=d.length+(d.length&1)}});
+    return t;
+  },
+  async embed(blob,tiff,w,h){
+    if(!tiff)return blob;
+    const b=new Uint8Array(await blob.arrayBuffer()),dv=new DataView(b.buffer);
+    const be16=n=>[n>>>8&255,n&255],be32=n=>[n>>>24&255,n>>>16&255,n>>>8&255,n&255],le32=n=>[n&255,n>>>8&255,n>>>16&255,n>>>24&255],le24=n=>[n&255,n>>>8&255,n>>>16&255];
+    if(blob.type==='image/jpeg'){
+      if(tiff.length>65000)return blob;
+      let at=2;if(b[2]===0xFF&&b[3]===0xE0)at=4+dv.getUint16(4);
+      const app1=new Uint8Array([0xFF,0xE1,...be16(tiff.length+8),0x45,0x78,0x69,0x66,0,0]);
+      return new Blob([b.subarray(0,at),app1,tiff,b.subarray(at)],{type:blob.type});
+    }
+    if(blob.type==='image/png'){
+      const at=8+12+dv.getUint32(8);
+      const body=new Uint8Array(4+tiff.length);body.set([0x65,0x58,0x49,0x66]);body.set(tiff,4);
+      const chunk=new Uint8Array([...be32(tiff.length),...body,...be32(crc32(body))]);
+      return new Blob([b.subarray(0,at),chunk,b.subarray(at)],{type:blob.type});
+    }
+    if(blob.type==='image/webp'){
+      const str=(o,n)=>String.fromCharCode(...b.subarray(o,o+n));
+      const parts=[];let rest=b.subarray(12);
+      if(str(12,4)==='VP8X'){const x=b.slice(12,30);x[8]|=0x08;parts.push(x);rest=b.subarray(30)}
+      else{const alpha=str(12,4)==='VP8L'&&(b[20+4]&0x10);parts.push(new Uint8Array([0x56,0x50,0x38,0x58,...le32(10),0x08|(alpha?0x10:0),0,0,0,...le24(w-1),...le24(h-1)]))}
+      const exif=new Uint8Array([0x45,0x58,0x49,0x46,...le32(tiff.length),...tiff,...(tiff.length&1?[0]:[])]);
+      const total=4+parts[0].length+rest.length+exif.length;
+      return new Blob([new Uint8Array([0x52,0x49,0x46,0x46,...le32(total),0x57,0x45,0x42,0x50]),parts[0],rest,exif],{type:blob.type});
+    }
+    return blob;
+  }
+};
+
+function uniqueNames(list){const seen=new Map();return list.map(e=>{let n=e.name,k=seen.get(n)||0;seen.set(n,k+1);if(k)n=n.replace(/(\.[^.]+)$/,`-${k+1}$1`);return {...e,name:n}})}
+/* ZIP minimal (méthode STORE), sans bibliothèque externe */
+const u16=n=>[n&255,(n>>>8)&255],u32=n=>[n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255];
+async function zipBlob(entries){
+  const enc=new TextEncoder(),locals=[],centrals=[];let offset=0;
+  for(const e of entries){
+    const name=enc.encode(e.name),data=new Uint8Array(await e.blob.arrayBuffer()),crc=crc32(data);
+    const local=new Uint8Array([...u32(0x04034b50),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...name]);
+    locals.push(local,data);
+    centrals.push(new Uint8Array([...u32(0x02014b50),...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(33),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset),...name]));
+    offset+=local.length+data.length;
+  }
+  const size=centrals.reduce((s,a)=>s+a.length,0);
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(entries.length),...u16(entries.length),...u32(size),...u32(offset),...u16(0)]);
+  return new Blob([...locals,...centrals,end],{type:'application/zip'});
+}
+
+/* Barre de progression de l'importation */
+const Loader={
+  show(label,done,total){const box=$('importBox');if(!box)return;box.hidden=false;const pct=total?Math.round(done/total*100):0;
+    $('importLabel').textContent=`${label} : ${done} / ${total}`;$('importPct').textContent=pct+' %';$('importBar').style.width=pct+'%'},
+  hide(){const box=$('importBox');if(box)box.hidden=true}
+};
+/* Laisse le navigateur afficher la progression avant de continuer */
+const tick=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));
+const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('délai dépassé')),ms))]);
+/* Aperçu réduit, décodé directement en petite taille (rapide et économe en mémoire).
+   En cas d'échec : pas d'aperçu, plutôt que d'afficher la photo en pleine résolution. */
+let thumbFailures=0;
+async function makeThumb(blob,max=360){
+  if(thumbFailures>=3)return null;
+  let bmp=null;
+  try{
+    try{bmp=await withTimeout(createImageBitmap(blob,{resizeWidth:max,resizeQuality:'medium'}),8000)}
+    catch(e){if(e.message==='délai dépassé')throw e;bmp=await withTimeout(createImageBitmap(blob),8000)}
+    const r=Math.min(1,max/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');c.width=Math.max(1,Math.round(bmp.width*r));c.height=Math.max(1,Math.round(bmp.height*r));
+    const ctx=c.getContext('2d');ctx.imageSmoothingQuality='high';ctx.drawImage(bmp,0,0,c.width,c.height);
+    const t=await new Promise(res=>c.toBlob(res,'image/webp',.82));
+    c.width=c.height=0;
+    return t?URL.createObjectURL(t):null;
+  }catch(e){console.warn('Aperçu impossible',e);thumbFailures++;return null}
+  finally{if(bmp&&bmp.close)bmp.close()}
+}
+function thumbBox(url,alt){
+  const t=el('div','thumb');
+  if(url){const i=el('img');i.src=url;i.alt=alt;i.decoding='async';i.loading='lazy';t.append(i)}
+  else t.append(el('span','card-meta','Aperçu indisponible'));
+  return t;
+}
+/* Importe des images par petits lots, avec aperçus, progression et affichage au fil de l'eau */
+async function importImages(files,push,render){
+  const total=files.length,BATCH=3;let last=performance.now();
+  Loader.show('Importation',0,total);await tick();
+  for(let i=0;i<total;i+=BATCH){
+    const part=files.slice(i,i+BATCH);
+    const urls=await Promise.all(part.map(f=>makeThumb(f)));
+    part.forEach((f,k)=>push(f,urls[k]));
+    Loader.show('Importation',Math.min(i+BATCH,total),total);
+    if(performance.now()-last>500){render();last=performance.now()}
+    await tick();
+  }
+  render();setTimeout(Loader.hide,700);thumbFailures=0;
+}
+</script>
+<script>
+
+</script>
+</body>
+</html>
